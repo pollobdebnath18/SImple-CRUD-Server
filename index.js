@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 //middleware
 app.use(cors());
@@ -26,9 +26,43 @@ const run = async () => {
 
     const db = client.db("SimpleCrud");
     const userCollection = db.collection("users");
+    // client.db("SimpleCrud").collection("users");
+
+
+    //READ all user
     app.get("/users", async (req, res) => {
       const cursor = userCollection.find();
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    //READ user details
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      // res.send("user by id");
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const user = await userCollection.findOne(query);
+      // console.log(req.params);
+      res.send(user);
+    });
+
+    //CREATE
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      console.log("Post method: user to be inserted", newUser);
+      const result = await userCollection.insertOne(newUser);
+      res.send(result);
+    });
+
+    //DELETE
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await userCollection.deleteOne(query);
       res.send(result);
     });
 
