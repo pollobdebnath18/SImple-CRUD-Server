@@ -28,7 +28,6 @@ const run = async () => {
     const userCollection = db.collection("users");
     // client.db("SimpleCrud").collection("users");
 
-
     //READ all user
     app.get("/users", async (req, res) => {
       const cursor = userCollection.find();
@@ -53,6 +52,24 @@ const run = async () => {
       const newUser = req.body;
       console.log("Post method: user to be inserted", newUser);
       const result = await userCollection.insertOne(newUser);
+      res.send(result);
+    });
+
+    //UPDATE
+    app.patch("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = {
+        _id: new ObjectId(id),
+      };
+      const updateUser = req.body;
+      const updatedDocument = {
+        $set: {
+          name: updateUser.name,
+          email: updateUser.email,
+          role: updateUser.role,
+        },
+      };
+      const result = await userCollection.updateOne(filter, updatedDocument);
       res.send(result);
     });
 
